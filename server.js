@@ -19,6 +19,10 @@ app.use(cors({
 //Routes
 app.use("/api/auth", authRoutes);
 
+app.get("/", (req, res) => {
+    res.status(200).send("Server Running Successfully");
+});
+
 //dbConnection
 dbConnection()
   .then(() => console.log("✅✅ MongoDB Connected"))
