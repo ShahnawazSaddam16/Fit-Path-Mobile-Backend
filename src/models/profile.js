@@ -8,9 +8,13 @@ const profileSchema = new mongoose.Schema(
             required: true,
             unique: true
         },
-        Image: {
+        email: {
             type: String,
             required: true
+        },
+        Image: {
+            data: Buffer,
+            contentType: String
         },
         age: {
             type: Number,
