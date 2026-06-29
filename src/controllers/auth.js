@@ -1,4 +1,5 @@
 const User = require("../models/auth");
+const Profile = require("../models/profile");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -44,6 +45,7 @@ const SignUp = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                hasProfile: false,
             }
         });
 
@@ -90,6 +92,8 @@ const Login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
+        const profile = await Profile.findOne({ userId: user._id });
+
         return res.status(200).json({
             success: true,
             message: "Login successful",
@@ -98,6 +102,7 @@ const Login = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                hasProfile: !!profile,
             }
         });
 
@@ -126,7 +131,7 @@ const Logout = async (req, res) => {
 
 const Me = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("-password");
+        const user = await User.findById(req.user._id).select("-password");
 
         if (!user) {
             return res.status(404).json({
@@ -135,12 +140,15 @@ const Me = async (req, res) => {
             });
         }
 
+        const profile = await Profile.findOne({ userId: req.user._id });
+
         return res.status(200).json({
             success: true,
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                hasProfile: !!profile,
             }
         });
 
