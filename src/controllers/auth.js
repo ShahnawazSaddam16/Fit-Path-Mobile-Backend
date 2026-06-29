@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const SignUp = async (req, res) => {
     try {
-        const { name, email, password, expoPushToken } = req.body;
+        const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -28,7 +28,6 @@ const SignUp = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            expoPushToken: expoPushToken || null
         });
 
         const token = jwt.sign(
@@ -45,7 +44,6 @@ const SignUp = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                expoPushToken: user.expoPushToken
             }
         });
 
@@ -59,7 +57,7 @@ const SignUp = async (req, res) => {
 
 const Login = async (req, res) => {
     try {
-        const { email, password, expoPushToken } = req.body;
+        const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({
@@ -86,10 +84,6 @@ const Login = async (req, res) => {
             });
         }
 
-        if (expoPushToken && expoPushToken !== user.expoPushToken) {
-            await User.findByIdAndUpdate(user._id, { expoPushToken });
-        }
-
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
@@ -104,7 +98,6 @@ const Login = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                expoPushToken: user.expoPushToken
             }
         });
 
@@ -118,12 +111,6 @@ const Login = async (req, res) => {
 
 const Logout = async (req, res) => {
     try {
-        const { expoPushToken } = req.body;
-
-        if (expoPushToken) {
-            await User.findByIdAndUpdate(req.userId, { expoPushToken: null });
-        }
-
         return res.status(200).json({
             success: true,
             message: "Logout successful"
@@ -154,7 +141,6 @@ const Me = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                expoPushToken: user.expoPushToken
             }
         });
 
