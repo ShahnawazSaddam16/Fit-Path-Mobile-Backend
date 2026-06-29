@@ -56,6 +56,33 @@ const CreateProfile = async (req, res) => {
     }
 };
 
+const userProfile = async (req, res) => {
+    try {
+        const userprofile = await Profile.findOne({
+            userId: req.user._id
+        });
+
+        if (!userprofile) {
+            return res.status(404).json({
+                success: false,
+                message: "Profile not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            userprofile
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+
 module.exports = {
-    CreateProfile
+    CreateProfile,
+    userProfile
 };
