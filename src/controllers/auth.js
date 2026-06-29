@@ -1,0 +1,169 @@
+const User = require("../models/auth");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const SignUp = async (req, res) => {
+    try {
+        const { name, email, password, expoPushToken } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all fields"
+            });
+        }
+
+        const existingEmail = await User.findOne({ email });
+
+        if (existingEmail) {
+            return res.status(409).json({
+                success: false,
+                message: "Email already registered"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            expoPushToken: expoPushToken || null
+        });
+
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Account created successfully",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                expoPushToken: user.expoPushToken
+            }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+const Login = async (req, res) => {
+    try {
+        const { email, password, expoPushToken } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all fields"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid password"
+            });
+        }
+
+        if (expoPushToken && expoPushToken !== user.expoPushToken) {
+            await User.findByIdAndUpdate(user._id, { expoPushToken });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                expoPushToken: user.expoPushToken
+            }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+const Logout = async (req, res) => {
+    try {
+        const { expoPushToken } = req.body;
+
+        if (expoPushToken) {
+            await User.findByIdAndUpdate(req.userId, { expoPushToken: null });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+const Me = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                expoPushToken: user.expoPushToken
+            }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+module.exports = { SignUp, Login, Logout, Me };
