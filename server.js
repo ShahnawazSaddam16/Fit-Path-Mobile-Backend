@@ -9,7 +9,6 @@ const PORT = process.env.PORT;
 //Middleware
 app.use(express.json());
 
-//RateLimit
 
 //Routes
 
