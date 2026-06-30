@@ -43,13 +43,13 @@ const CreateProfile = async (req, res) => {
             sleep
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "Profile created successfully",
             profile: userProfile
         });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: error.message
         });
@@ -81,8 +81,51 @@ const userProfile = async (req, res) => {
     }
 };
 
+const editProfile = async (req, res) => {
+    try {
+        const { age, weight, height, sports, sleep } = req.body;
+
+        const profile = await Profile.findOne({
+            userId: req.user._id
+        });
+
+        if (!profile) {
+            return res.status(404).json({
+                success: false,
+                message: "Profile not found"
+            });
+        }
+
+        if (age) profile.age = age;
+        if (weight) profile.weight = weight;
+        if (height) profile.height = height;
+        if (sports) profile.sports = sports;
+        if (sleep) profile.sleep = sleep;
+
+        if (req.file) {
+            profile.Image = {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            };
+        }
+
+        await profile.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            profile
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
 
 module.exports = {
     CreateProfile,
-    userProfile
+    userProfile,
+    editProfile
 };
