@@ -83,17 +83,12 @@ const userProfile = async (req, res) => {
 
 const editProfile = async (req, res) => {
     try {
-        const { age, weight, height, sports, sleep } = req.body;
+        const { age, weight, height, sports, sleep } = req.body || {};
 
-        const profile = await Profile.findOne({
-            userId: req.user._id
-        });
+        const profile = await Profile.findOne({ userId: req.user._id });
 
         if (!profile) {
-            return res.status(404).json({
-                success: false,
-                message: "Profile not found"
-            });
+            return res.status(404).json({ success: false, message: "Profile not found" });
         }
 
         if (age) profile.age = age;
@@ -103,10 +98,7 @@ const editProfile = async (req, res) => {
         if (sleep) profile.sleep = sleep;
 
         if (req.file) {
-            profile.Image = {
-                data: req.file.buffer,
-                contentType: req.file.mimetype
-            };
+            profile.Image = { data: req.file.buffer, contentType: req.file.mimetype };
         }
 
         await profile.save();
@@ -114,15 +106,13 @@ const editProfile = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Profile updated successfully",
-            profile
+            profile,
         });
     } catch (err) {
-        return res.status(500).json({
-            success: false,
-            message: err.message
-        });
+        return res.status(500).json({ success: false, message: err.message });
     }
 };
+
 
 module.exports = {
     CreateProfile,

@@ -7,6 +7,6 @@ const {CreateProfile, userProfile, editProfile} = require("../controllers/profil
 
 router.post("/create-profile", limiter, upload.single("Image"), authMiddleware, CreateProfile);
 router.get("/user-profile", limiter, authMiddleware, userProfile);
-router.put("/edit-profile", limiter, authMiddleware, editProfile);
+router.put("/edit-profile", limiter, upload.single("image"), authMiddleware, editProfile);
 
 module.exports = router;
