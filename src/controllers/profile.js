@@ -58,16 +58,24 @@ const CreateProfile = async (req, res) => {
 
 const userProfile = async (req, res) => {
     try {
-        const userprofile = await Profile.findOne({
+        const profile = await Profile.findOne({
             userId: req.user._id
         });
 
-        if (!userprofile) {
+        if (!profile) {
             return res.status(404).json({
                 success: false,
                 message: "Profile not found"
             });
         }
+
+        const userprofile = profile.toObject();
+
+        if (userprofile.Image && userprofile.Image.data) {
+            userprofile.imageBase64 = `data:${userprofile.Image.contentType};base64,${userprofile.Image.data.toString("base64")}`;
+        }
+
+        delete userprofile.Image;
 
         return res.status(200).json({
             success: true,
@@ -80,6 +88,7 @@ const userProfile = async (req, res) => {
         });
     }
 };
+
 
 const editProfile = async (req, res) => {
     try {
