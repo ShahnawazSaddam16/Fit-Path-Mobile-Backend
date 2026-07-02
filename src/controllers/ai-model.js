@@ -3,6 +3,7 @@ require("dotenv").config();
 const Groq = require("groq-sdk");
 const Profile = require("../models/profile");
 const AIChat = require("../models/ai-model");
+const History = require("../models/history");
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
@@ -140,13 +141,20 @@ ${cleanedPrompt}
             response: aiResponse
         });
 
+        await History.create({
+            userId: req.user._id,
+            profileId: profile._id,
+            aiChatId: chat._id,
+            prompt: cleanedPrompt,
+            response: aiResponse
+        });
+
         return res.status(200).json({
             success: true,
             message: "Response generated successfully",
             chat,
             response: aiResponse
         });
-
     } catch (error) {
         return res.status(500).json({
             success: false,

@@ -5,7 +5,7 @@ const dbConnection = require("./src/config/dbConnection");
 const authRoutes = require("./src/routes/authRoutes");
 const profileRoutes = require("./src/routes/profileRoutes");
 const AIModelRoutes = require("./src/routes/aiRoutes");
-const profile = require("./src/models/profile");
+const historyRoutes = require("./src/routes/historyRoutes");
 
 dotenv.config();
 const app = express();
@@ -23,6 +23,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api", profileRoutes);
 app.use("/api", AIModelRoutes);
+app.use("/api", historyRoutes);
 
 app.get("/", (req, res) => {
     res.status(200).send("Server Running Successfully");
