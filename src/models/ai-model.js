@@ -7,6 +7,10 @@ const aiChatSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
+        email:{
+            type: String,
+            required: true
+        },
         profileId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Profile",

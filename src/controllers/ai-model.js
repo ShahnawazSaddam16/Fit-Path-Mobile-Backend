@@ -136,6 +136,7 @@ ${cleanedPrompt}
 
         const chat = await AIChat.create({
             userId: req.user._id,
+            email: req.user.email,
             profileId: profile._id,
             prompt: cleanedPrompt,
             response: aiResponse
@@ -143,6 +144,7 @@ ${cleanedPrompt}
 
         await History.create({
             userId: req.user._id,
+            email: req.user.email,
             profileId: profile._id,
             aiChatId: chat._id,
             prompt: cleanedPrompt,

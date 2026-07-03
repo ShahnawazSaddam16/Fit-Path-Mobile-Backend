@@ -1,5 +1,6 @@
 const User = require("../models/auth");
 const Profile = require("../models/profile");
+const History = require("../models/history");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -119,6 +120,41 @@ const Logout = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Logout successful"
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+const DeleteAccount = async (req, res) => {
+    try {
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized"
+            });
+        }
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        await Profile.findOneAndDelete({ userId: req.user._id });
+        await History.deleteMany({userId: req.user._id});
+        await User.findByIdAndDelete(req.user._id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Account deleted successfully"
         });
 
     } catch (err) {
