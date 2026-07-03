@@ -196,4 +196,4 @@ const Me = async (req, res) => {
     }
 };
 
-module.exports = { SignUp, Login, Logout, Me };
+module.exports = { SignUp, Login, Logout, Me, DeleteAccount };
