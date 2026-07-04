@@ -5,8 +5,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 const {CreateProfile, userProfile, editProfile} = require("../controllers/profile");
 
-router.post("/create-profile", limiter, upload.single("Image"), authMiddleware, CreateProfile);
+router.post("/create-profile", limiter,  authMiddleware,  upload.single("Image"), CreateProfile);
 router.get("/user-profile", limiter, authMiddleware, userProfile);
-router.put("/edit-profile", limiter, upload.single("image"), authMiddleware, editProfile);
+router.put("/edit-profile", limiter, authMiddleware, upload.single("image"), editProfile);
 
 module.exports = router;
